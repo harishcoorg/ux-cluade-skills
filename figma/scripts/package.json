@@ -1,0 +1,16 @@
+{
+  "name": "figma-integration-scripts",
+  "version": "1.0.0",
+  "description": "Scripts to sync Claude Code UX outputs with Figma",
+  "scripts": {
+    "push-tokens": "node push-tokens.js",
+    "create-wireframes": "node create-wireframes.js ../../outputs/wireframes/figma-import.json",
+    "pull-components": "node pull-components.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

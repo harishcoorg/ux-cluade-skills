@@ -1,0 +1,12 @@
+# macOS system file
+.DS_Store
+
+# Claude folder
+.claude/
+
+# ignore local files named harishcoorg
+harishcoorg
+harishcoorg.pub
+~/.ssh/harishcoorg
+~/.ssh/harishcoorg.pub
+
