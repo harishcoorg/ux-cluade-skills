@@ -221,10 +221,10 @@ Figma is connected via the **Figma MCP (claude-plugins-official) Claude calls Fi
 **Prerequisite:** `PROJECT_BRIEF.md` must contain a `Figma File URL` under the `Figma Integration` section. Claude extracts the file key automatically.
 
 **How it works:**
-1. Claude calls `mcp__figma__use_figma` with Figma Plugin API JavaScript
-2. The Figma MCP (claude-plugins-official) server forwards the code to the Bridge Plugin in Figma Desktop
-3. Figma executes the code and returns the result — pages, frames, and variables are created live
-4. No manual file loading or plugin steps needed
+1. Claude calls `mcp__figma__use_figma` to write designs (frames, variables, components) directly into Figma
+2. The Figma MCP (claude-plugins-official) handles the request via the Figma REST API
+3. Figma updates the file live — pages, frames, and variables are created immediately
+4. No Bridge Plugin, local MCP server, or manual steps needed
 
 **Requirement:** A valid Figma access token must be configured in the Figma MCP (claude-plugins-official).
 

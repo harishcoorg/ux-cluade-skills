@@ -1,8 +1,8 @@
 # Figma MCP Integration Setup
 
-This guide explains how Claude Code connects to Figma via the **figma-console MCP server** (southleft/figma-console-mcp) to directly create pages, frames, variables, and components in Figma — no manual plugin steps needed.
+This guide explains how Claude Code connects to Figma via the **Figma MCP (claude-plugins-official)** to read designs, push frames, variables, and components into Figma — no Bridge Plugin or local MCP server required.
 
-> **You have already installed the figma-console MCP and are running the Figma Bridge Plugin.**
+> **You are using the official Figma MCP provided by Anthropic (claude-plugins-official).**
 > This file documents how Claude uses these tools in each phase.
 
 ---
@@ -12,66 +12,45 @@ This guide explains how Claude Code connects to Figma via the **figma-console MC
 ```
 Claude Code (Claude AI)
     │
-    ├── mcp__figma-console__figma_execute          ← Run any Figma Plugin API JS
-    ├── mcp__figma-console__figma_batch_create_variables  ← Bulk Variable push
-    ├── mcp__figma-console__figma_setup_design_tokens    ← Full token push
-    ├── mcp__figma-console__figma_get_file_data          ← Read file structure
-    └── mcp__figma-console__figma_get_variables          ← Read Variables
+    ├── mcp__figma__use_figma              ← Write designs into Figma (frames, variables, components)
+    ├── mcp__figma__get_design_context     ← Read design context, components, variables
+    ├── mcp__figma__get_metadata           ← Read file structure and node metadata
+    ├── mcp__figma__get_screenshot         ← Capture screenshots of frames/nodes
+    └── mcp__figma__generate_diagram       ← Create diagrams in FigJam
             │
             ▼
-    figma-console MCP Server (node dist/local.js)
+    Figma MCP (claude-plugins-official)
             │
             ▼
-    Figma Bridge Plugin (running in Figma Desktop)
-            │
-            ▼
-    Figma File — NmLHhW3lmdC66JpvFDNPGs (pocket_ledger)
+    Figma REST API + Figma File
 ```
 
 ---
 
-## Setup (one-time — already done)
+## Setup (one-time)
 
-### 1. MCP server installed
-```
-MCP-Console/figma-console-mcp/dist/local.js
-```
+### 1. Add Figma MCP via claude-plugins-official
 
-### 2. Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`)
-```json
-{
-  "preferences": { ... },
-  "mcpServers": {
-    "figma-console": {
-      "command": "node",
-      "args": [".../MCP-Console/figma-console-mcp/dist/local.js"],
-      "env": {
-        "FIGMA_ACCESS_TOKEN": "figd_...",
-        "ENABLE_MCP_APPS": "true"
-      }
-    }
-  }
-}
+In Claude Code, install the official Figma MCP:
+```
+claude mcp add --transport http figma https://mcp.figma.com/sse
 ```
 
-### 3. Claude Code config (`~/.claude/settings.json`)
-```json
-{
-  "mcpServers": {
-    "figma-console": {
-      "command": "node",
-      "args": [".../MCP-Console/figma-console-mcp/dist/local.js"],
-      "env": {
-        "FIGMA_ACCESS_TOKEN": "figd_...",
-        "ENABLE_MCP_APPS": "true"
-      }
-    }
-  }
-}
+Or via Claude Desktop → Settings → Integrations → search "Figma" → Connect.
+
+### 2. Authenticate
+
+When prompted, sign in with your Figma account to grant access. Your Figma Personal Access Token is managed by the MCP — no manual token configuration needed.
+
+### 3. Set your Figma File URL in `PROJECT_BRIEF.md`
+
+```markdown
+## Figma Integration
+- Figma File URL: https://www.figma.com/design/YOUR_FILE_KEY/your-file-name
+- Figma File Key: YOUR_FILE_KEY
 ```
 
-### 4. Figma Desktop — Bridge Plugin running
-Ensure the Figma Bridge Plugin is active in Figma Desktop before running any design command.
+Claude extracts the file key automatically from the URL.
 
 ---
 
@@ -79,18 +58,18 @@ Ensure the Figma Bridge Plugin is active in Figma Desktop before running any des
 
 | Command | MCP Tools Called | What Happens in Figma |
 |---------|-----------------|----------------------|
-| `/ux-wireframe` | `figma_execute` (×N per screen) | Page `01_LoFi_Wireframes` created; frames + layers pushed directly |
-| `/ux-design-system` | `figma_execute` + `figma_batch_create_variables` | Page `00_Design_System` created; 5 Variable collections pushed; section frames created |
-| `/ux-hifi` | `figma_execute` (×N per screen) | Page `03_HiFi_Designs` created; hi-fi frames with token-referenced colours pushed |
-| `/ux-to-code` | `figma_execute` (×3 read calls) | Component + frame node IDs extracted; `figma-component-map.json` saved |
-| `/ux-to-pages` | `figma_execute` (×1 read call) | Screen frame + layer structure extracted; `figma-screen-map.json` saved |
+| `/ux-wireframe` | `use_figma` (×N per screen) | Page `01_LoFi_Wireframes` created; frames + layers pushed directly |
+| `/ux-design-system` | `use_figma` (variables + frames) | Page `00_Design_System` created; 5 Variable collections pushed; SDS primitives created |
+| `/ux-hifi` | `use_figma` (×N per screen) | Page `03_HiFi_Designs` created; hi-fi frames with token-referenced colours pushed |
+| `/ux-to-code` | `get_design_context` + `get_metadata` (×3 calls) | Component + frame node IDs extracted; `figma-component-map.json` saved |
+| `/ux-to-pages` | `get_design_context` (×1 call) | Screen frame + layer structure extracted; `figma-screen-map.json` saved |
 
 ---
 
 ## Figma File Structure (auto-created by commands)
 
 ```
-📁 pocket_ledger (NmLHhW3lmdC66JpvFDNPGs)
+📁 your_project (YOUR_FILE_KEY)
   📄 Foundations             ← Created by /ux-design-system (SDS page 1)
        Color swatches, type scale, spacing scale
        Variables: Primitives/Color | Semantic (Light+Dark) | Primitives/Size | Primitives/Typography | Responsive
@@ -109,93 +88,16 @@ Ensure the Figma Bridge Plugin is active in Figma Desktop before running any des
 
 ---
 
-## Key Figma Plugin API Patterns
-
-Claude uses these patterns inside `figma_execute` calls:
-
-### Check / create a page
-```javascript
-let page = figma.root.children.find(p => p.name === 'PageName');
-if (!page) {
-  page = figma.createPage();
-  page.name = 'PageName';
-}
-figma.currentPage = page;
-return `Page ready: ${page.name}`;
-```
-
-### Create a frame with a layout grid
-```javascript
-const frame = figma.createFrame();
-frame.name = 'S-01_Dashboard_LoFi — Desktop';
-frame.resize(1440, 960);
-frame.x = 0; frame.y = 0;
-frame.fills = [{ type: 'SOLID', color: { r: 0.96, g: 0.96, b: 0.96 } }];
-frame.layoutGrids = [{ pattern: 'COLUMNS', count: 12, gutterSize: 24, offset: 80, color: { r: 0.2, g: 0.4, b: 0.9, a: 0.08 } }];
-figma.currentPage.appendChild(frame);
-return `Created: ${frame.name}`;
-```
-
-### Add text
-```javascript
-await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
-const text = figma.createText();
-text.characters = 'Headline text';
-text.fontSize = 48;
-text.fills = [{ type: 'SOLID', color: { r: 0.09, g: 0.09, b: 0.10 } }];
-text.x = 80; text.y = 160;
-parentFrame.appendChild(text);
-```
-
-### Read all components from a page
-```javascript
-const dsPage = figma.root.children.find(p => p.name === '00_Design_System');
-figma.currentPage = dsPage;
-const components = figma.currentPage.findAllWithCriteria({ types: ['COMPONENT'] });
-return JSON.stringify(components.map(c => ({ name: c.name, id: c.id })));
-```
-
-### Read all Variables
-```javascript
-const vars = figma.variables.getLocalVariables();
-const collections = figma.variables.getLocalVariableCollections();
-return JSON.stringify({ collections: collections.length, variables: vars.length });
-```
-
----
-
-## Design Token Push Format (for `figma_batch_create_variables`)
-
-```json
-{
-  "collections": [
-    {
-      "name": "🎯 Semantic Tokens",
-      "modes": ["Light", "Dark"],
-      "variables": [
-        {
-          "name": "Background/Primary",
-          "type": "COLOR",
-          "values": { "Light": "#FAFAFA", "Dark": "#18181B" }
-        }
-      ]
-    }
-  ]
-}
-```
-
----
-
 ## Troubleshooting
 
 | Problem | Fix |
 |---------|-----|
-| `mcp__figma-console__*` tools not found | Restart Claude Code — settings.json is now configured |
-| Bridge Plugin not connecting | Ensure Figma Desktop is open with the target file and Bridge Plugin is running |
-| `figma_execute` timeout | Break large operations into multiple calls (one frame at a time) |
+| `mcp__figma__*` tools not found | Restart Claude Code after installing the Figma MCP via claude-plugins-official |
+| Authentication error | Re-authenticate via Claude Desktop → Settings → Integrations → Figma |
+| `use_figma` timeout | Break large operations into multiple calls (one frame at a time) |
 | Font load error | Always `await figma.loadFontAsync(...)` before creating text nodes |
 | Page already exists warning | The commands check for existing pages and navigate to them rather than duplicating |
-| Variables not showing in Figma | Verify `ENABLE_MCP_APPS=true` in MCP server env config |
+| Variables not showing in Figma | Ensure your Figma plan supports the Variables API (Professional or Org) |
 
 ---
 
