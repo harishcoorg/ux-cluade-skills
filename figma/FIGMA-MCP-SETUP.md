@@ -61,6 +61,7 @@ Claude extracts the file key automatically from the URL.
 | `/ux-wireframe` | `use_figma` (×N per screen) | Page `01_LoFi_Wireframes` created; frames + layers pushed directly |
 | `/ux-design-system` | `use_figma` (variables + frames) | Page `00_Design_System` created; 5 Variable collections pushed; SDS primitives created |
 | `/ux-hifi` | `use_figma` (×N per screen) | Page `03_HiFi_Designs` created; hi-fi frames with token-referenced colours pushed |
+| `/ux-figma-docs` | `use_figma` (×1–N per phase) | Page `05_UX_Documentation` created; one section frame per phase with research, personas, findings, and deliverables rendered as text and tables |
 | `/ux-to-code` | `get_design_context` + `get_metadata` (×3 calls) | Component + frame node IDs extracted; `figma-component-map.json` saved |
 | `/ux-to-pages` | `get_design_context` (×1 call) | Screen frame + layer structure extracted; `figma-screen-map.json` saved |
 
@@ -78,6 +79,10 @@ Claude extracts the file key automatically from the URL.
        Notification | Tooltip | Avatar | Dialog | Menu | Select | Search | Slider | Pagination | Link | Text | Textarea | Icon
   📄 Compositions            ← Created by /ux-design-system (SDS page 3)
        Cards | Forms | Headers | Footers | Sections
+  📄 05_UX_Documentation     ← Created by /ux-figma-docs (runs as final step of every phase)
+       One section frame per phase: Discovery | Empathy | Research | Synthesis | Framing
+       Ideation | IA | Content | Brief | Visual Direction | Prototype | Tests | Handoff | Measure
+       Each frame: phase title, project name, date, key deliverables as text/tables/callouts
   📄 01_LoFi_Wireframes      ← Created by /ux-wireframe
        Frames per screen: [ID]_[Name]_LoFi — Desktop | Mobile
   📄 02_Prototype_Flows      ← Manual (guided by /ux-prototype output)

@@ -18,7 +18,7 @@ claude .
 - **Claude Code** installed (`claude` CLI)
 - **Figma account** — Professional or Org plan (needed for Figma Variables API)
 - **Figma MCP (claude-plugins-official)** configured — see `figma/FIGMA-MCP-SETUP.md`
-- **Node.js v18+** — only needed for Figma push scripts
+- **Node.js v18+** — only needed for frontend code generation
 
 ---
 

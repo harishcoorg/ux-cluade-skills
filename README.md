@@ -25,8 +25,8 @@ Every command saves its output as Markdown files in `outputs/`. Designs push dir
 |-------------|----------------|
 | Claude Code | [claude.ai/code](https://claude.ai/code) |
 | Figma account | Professional or Org plan (for Figma Variables API) |
-| figma-console MCP | [southleft/figma-console-mcp](https://github.com/southleft/figma-console-mcp) — see `figma/FIGMA-MCP-SETUP.md` |
-| Node.js v18+ | For Figma push scripts (optional) |
+| Figma MCP | Install via claude-plugins-official — see `figma/FIGMA-MCP-SETUP.md` |
+| Node.js v18+ | For frontend code generation (optional) |
 
 ---
 

@@ -198,18 +198,20 @@ At the end of every session, update `PROJECT_BRIEF.md` with:
 | Command | Description |
 |---------|-------------|
 | `/ux-status` | Dashboard showing all phase completions, approval gates, next step |
+| `/ux-figma-docs` | Push any completed phase output to the `05_UX_Documentation` Figma page as a structured documentation frame. Run after any phase: `/ux-figma-docs discovery` or push all at once: `/ux-figma-docs all` |
 
 ## Figma Integration
 
-Figma is connected via the **Figma MCP (claude-plugins-official) Claude calls Figma tools directly — no manual plugin steps required.
+Figma is connected via the **Figma MCP (claude-plugins-official)**. Claude calls Figma tools directly — no manual plugin steps required.
 
 **Push to Figma (write) — fully automated:**
 
 | Command | Creates Figma Page | MCP Tools Used |
 |---------|-------------------|----------------|
-| `/ux-wireframe` | `01_LoFi_Wireframes` | `figma_execute` — creates page + all frames + layers |
-| `/ux-design-system` | `Foundations` + `Components` + `Compositions` (SDS) | `figma_batch_create_variables` + `figma_execute` — pushes 5 Variable collections + 21 SDS primitives |
-| `/ux-hifi` | `03_HiFi_Designs` | `figma_execute` — creates hi-fi frames referencing design token colours |
+| `/ux-wireframe` | `01_LoFi_Wireframes` | `use_figma` — creates page + all frames + layers |
+| `/ux-design-system` | `Foundations` + `Components` + `Compositions` (SDS) | `use_figma` — pushes 5 Variable collections + 21 SDS primitives |
+| `/ux-hifi` | `03_HiFi_Designs` | `use_figma` — creates hi-fi frames referencing design token colours |
+| `/ux-figma-docs` | `05_UX_Documentation` | `use_figma` — creates a documentation section frame per phase with research, personas, flows, findings, and more |
 
 **Read from Figma (inspect) — fully automated:**
 
