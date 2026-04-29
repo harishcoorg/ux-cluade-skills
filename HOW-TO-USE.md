@@ -17,7 +17,7 @@ claude .
 ### 2. Prerequisites
 - **Claude Code** installed (`claude` CLI)
 - **Figma account** — Professional or Org plan (needed for Figma Variables API)
-- **figma-console MCP** configured — see `figma/FIGMA-MCP-SETUP.md`
+- **Figma MCP (claude-plugins-official)** configured — see `figma/FIGMA-MCP-SETUP.md`
 - **Node.js v18+** — only needed for Figma push scripts
 
 ---

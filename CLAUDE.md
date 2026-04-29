@@ -201,7 +201,7 @@ At the end of every session, update `PROJECT_BRIEF.md` with:
 
 ## Figma Integration
 
-Figma is connected via the **figma-console MCP server** (southleft/figma-console-mcp). Claude calls Figma tools directly — no manual plugin steps required.
+Figma is connected via the **Figma MCP (claude-plugins-official) Claude calls Figma tools directly — no manual plugin steps required.
 
 **Push to Figma (write) — fully automated:**
 
@@ -221,12 +221,12 @@ Figma is connected via the **figma-console MCP server** (southleft/figma-console
 **Prerequisite:** `PROJECT_BRIEF.md` must contain a `Figma File URL` under the `Figma Integration` section. Claude extracts the file key automatically.
 
 **How it works:**
-1. Claude calls `mcp__figma-console__figma_execute` with Figma Plugin API JavaScript
-2. The figma-console MCP server forwards the code to the Bridge Plugin in Figma Desktop
+1. Claude calls `mcp__figma__use_figma` with Figma Plugin API JavaScript
+2. The Figma MCP (claude-plugins-official) server forwards the code to the Bridge Plugin in Figma Desktop
 3. Figma executes the code and returns the result — pages, frames, and variables are created live
 4. No manual file loading or plugin steps needed
 
-**Requirement:** Figma Desktop must be open with the target file, and the Bridge Plugin must be running.
+**Requirement:** A valid Figma access token must be configured in the Figma MCP (claude-plugins-official).
 
 See `figma/FIGMA-MCP-SETUP.md` for tool reference, troubleshooting, and Plugin API patterns.
 
