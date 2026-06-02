@@ -12,18 +12,22 @@ This guide explains how Claude Code connects to Figma via the **Figma MCP (claud
 ```
 Claude Code (Claude AI)
     │
-    ├── mcp__figma__use_figma              ← Write designs into Figma (frames, variables, components)
-    ├── mcp__figma__get_design_context     ← Read design context, components, variables
-    ├── mcp__figma__get_metadata           ← Read file structure and node metadata
-    ├── mcp__figma__get_screenshot         ← Capture screenshots of frames/nodes
-    └── mcp__figma__generate_diagram       ← Create diagrams in FigJam
+    ├── mcp__plugin_figma_figma__use_figma              ← Write designs into Figma (frames, variables, components)
+    ├── mcp__plugin_figma_figma__get_design_context     ← Read design context, components, variables
+    ├── mcp__plugin_figma_figma__get_metadata           ← Read file structure and node metadata
+    ├── mcp__plugin_figma_figma__get_screenshot         ← Capture screenshots of frames/nodes
+    └── mcp__plugin_figma_figma__generate_diagram       ← Create diagrams in FigJam
             │
             ▼
-    Figma MCP (claude-plugins-official)
+    Figma MCP Plugin (plugin:figma:figma)
             │
             ▼
     Figma REST API + Figma File
 ```
+
+> **IMPORTANT:** Before calling `use_figma`, you must load the `figma-use` skill via the Skill tool.
+> Each UX command that writes to Figma will remind you of this. The skill teaches the correct
+> Plugin API patterns (auto-layout, variable binding, font loading) that prevent common errors.
 
 ---
 
@@ -56,14 +60,34 @@ Claude extracts the file key automatically from the URL.
 
 ## MCP Tools Used by Each Command
 
-| Command | MCP Tools Called | What Happens in Figma |
-|---------|-----------------|----------------------|
-| `/ux-wireframe` | `use_figma` (×N per screen) | Page `01_LoFi_Wireframes` created; frames + layers pushed directly |
-| `/ux-design-system` | `use_figma` (variables + frames) | Page `00_Design_System` created; 5 Variable collections pushed; SDS primitives created |
-| `/ux-hifi` | `use_figma` (×N per screen) | Page `03_HiFi_Designs` created; hi-fi frames with token-referenced colours pushed |
-| `/ux-figma-docs` | `use_figma` (×1–N per phase) | Page `05_UX_Documentation` created; one section frame per phase with research, personas, findings, and deliverables rendered as text and tables |
-| `/ux-to-code` | `get_design_context` + `get_metadata` (×3 calls) | Component + frame node IDs extracted; `figma-component-map.json` saved |
-| `/ux-to-pages` | `get_design_context` (×1 call) | Screen frame + layer structure extracted; `figma-screen-map.json` saved |
+### FigJam Commands (discovery & research — use `figma:figma-use-figjam` skill)
+
+| Command | Tool Calls | FigJam Board Created |
+|---------|-----------|---------------------|
+| `/ux-kickoff` | `use_figma` (×2–3) | `00_Kickoff` — stakeholder map section, RACI table stickies, risk pre-flight |
+| `/ux-discover` | `use_figma` (×3–4) | `01_Discovery` — assumption sticky wall, competitor cards section, risk register table |
+| `/ux-empathize` | `use_figma` (×4–5) | `02_Empathy` — empathy map 2×2 grid, task flow connectors, mental model diagram, storyboard |
+| `/ux-research` | `use_figma` (×2–3) | `03_Research` — research questions board, screener stickies |
+| `/ux-synthesize` | `use_figma` (×3–4) | `04_Synthesis` — affinity cluster stickies, journey map with swimlanes, persona cards |
+| `/ux-frame` | `use_figma` (×2–3) | `05_Framing` — HMW sticky voting board, POV cards, design principles |
+| `/ux-ideate` | `use_figma` (×2–3) | `06_Ideation` — concept sketch sections, evaluation matrix |
+| `/ux-sitemap` | `use_figma` (×2) | `07_Sitemap` — IA hierarchy with connectors, URL scheme |
+| `/ux-sprint` | `use_figma` (×5–8) | `08_Sprint` — one section per day, storyboard frames, rainbow spreadsheet |
+| `/ux-test` | `use_figma` (×2) | `09_Testing` — test plan board, task scenario cards |
+| `/ux-test-results` | `use_figma` (×2–3) | `09_Testing` — rainbow spreadsheet table, findings stickies by severity |
+
+### Figma Commands (design & code — use `figma:figma-use` skill)
+
+| Command | Tool Calls | Figma Page Created |
+|---------|-----------|-------------------|
+| `/ux-wireframe` | `use_figma` (×N per screen) | `01_LoFi_Wireframes` — annotated lo-fi frames |
+| `/ux-prototype` | `use_figma` (×N) | `02_Prototype_Flows` — interaction flow frames |
+| `/ux-design-system` | `use_figma` (variables + frames) | `00_Design_System` — 5 Variable collections + 21 SDS primitives |
+| `/ux-hifi` | `use_figma` (×N per screen) | `03_HiFi_Designs` — hi-fi frames with token colours |
+| `/ux-handoff` | `use_figma` (×N) | `04_Handoff_Specs` — annotated handoff frames |
+| `/ux-figma-docs` | `use_figma` (×1–N per phase) | `05_UX_Documentation` — design-phase summaries (brief, inspire, accessibility, measure) |
+| `/ux-to-code` | `get_design_context` + `get_metadata` | Reads `00_Design_System`; extracts component + token map |
+| `/ux-to-pages` | `get_design_context` | Reads `03_HiFi_Designs`; extracts screen frame structure |
 
 ---
 
@@ -97,7 +121,7 @@ Claude extracts the file key automatically from the URL.
 
 | Problem | Fix |
 |---------|-----|
-| `mcp__figma__*` tools not found | Restart Claude Code after installing the Figma MCP via claude-plugins-official |
+| `use_figma` tool not found | The Figma plugin uses `mcp__plugin_figma_figma__use_figma`. Restart Claude Code after installing the Figma MCP via claude-plugins-official |
 | Authentication error | Re-authenticate via Claude Desktop → Settings → Integrations → Figma |
 | `use_figma` timeout | Break large operations into multiple calls (one frame at a time) |
 | Font load error | Always `await figma.loadFontAsync(...)` before creating text nodes |

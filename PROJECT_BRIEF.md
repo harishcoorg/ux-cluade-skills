@@ -23,13 +23,33 @@
 ---
 
 ## Figma Integration
-- **Figma File URL:** [https://www.figma.com/file/XXXXXXXX/Your-Project-Name]
+- **Figma File URL:** [https://www.figma.com/design/XXXXXXXX/Your-Project-Name]
 - **Figma File Key:** [auto-extracted from URL — e.g. XXXXXXXX]
-- **Figma Pages:**
+- **Figma Pages (auto-created by commands):**
   - `00_Design_System` — design tokens + component library
   - `01_LoFi_Wireframes` — lo-fi wireframes
   - `02_Prototype_Flows` — prototype connection overlays
   - `03_HiFi_Designs` — high-fidelity designs
+  - `04_Handoff_Specs` — developer handoff specs
+  - `05_UX_Documentation` — design-phase outputs (brief, inspiration, accessibility, measure)
+
+## FigJam Integration
+- **FigJam File URL:** [https://www.figma.com/board/XXXXXXXX/Your-Project-Discovery]
+- **FigJam File Key:** [auto-extracted from URL — e.g. XXXXXXXX]
+- **FigJam Boards (auto-created by commands):**
+  - `00_Kickoff` — stakeholder map, RACI, risk pre-flight
+  - `01_Discovery` — assumption map, competitive analysis, heuristics, risk register
+  - `02_Empathy` — empathy maps, task flows, mental models, storyboards
+  - `03_Research` — research plan, screener, question bank
+  - `04_Synthesis` — affinity clusters, journey maps, persona cards
+  - `05_Framing` — HMW board, POV statements, design principles
+  - `06_Ideation` — concept sketches, evaluation matrix
+  - `07_Sitemap` — IA diagram, navigation hierarchy
+  - `08_Sprint` — 5-day sprint boards (if sprint is run)
+  - `09_Testing` — test plan, task scenarios, rainbow spreadsheet, findings
+
+> **Tip:** Create one Figma file for design artifacts and one FigJam file for discovery/research.
+> Both URLs are read from this file — all commands auto-detect which to use.
 
 ---
 

@@ -194,43 +194,64 @@ At the end of every session, update `PROJECT_BRIEF.md` with:
 |---------|-------------|-------------|
 | `/ux-measure` | After launch (or pre-launch planning) | Goal-metric mapping, hypothesis validation plan, instrumentation checklist, review schedule |
 
+### 🏃 Sprint Planning
+| Command | Description |
+|---------|-------------|
+| `/ux-sprint` | Run a full 5-day GV design sprint: sprint question, Day 1–5 plans, storyboard, prototype plan, test script, Day 5 rainbow spreadsheet, and sprint decision |
+| `/ux-persona` | Create or update personas standalone — with or without prior research. Arguments: `primary`, `secondary`, or a role name (e.g. `/ux-persona admin`) |
+
 ### 📊 Utility
 | Command | Description |
 |---------|-------------|
-| `/ux-status` | Dashboard showing all phase completions, approval gates, next step |
+| `/ux-status` | Dashboard showing all 19-phase completion status, approval gates, and next recommended step |
 | `/ux-figma-docs` | Push any completed phase output to the `05_UX_Documentation` Figma page as a structured documentation frame. Run after any phase: `/ux-figma-docs discovery` or push all at once: `/ux-figma-docs all` |
 
-## Figma Integration
+## Figma & FigJam Integration
 
-Figma is connected via the **Figma MCP (claude-plugins-official)**. Claude calls Figma tools directly — no manual plugin steps required.
+Both tools are connected via the **Figma MCP (plugin:figma:figma)**. Claude calls Figma and FigJam tools directly — no manual plugin steps required.
 
-**Push to Figma (write) — fully automated:**
+> **Skill loading rules:**
+> - Before every `use_figma` call on a **Figma** file → load `figma:figma-use` skill
+> - Before every `use_figma` call on a **FigJam** file → load `figma:figma-use-figjam` skill
+> - The actual MCP tool name is `mcp__plugin_figma_figma__use_figma` for both
 
-| Command | Creates Figma Page | MCP Tools Used |
-|---------|-------------------|----------------|
-| `/ux-wireframe` | `01_LoFi_Wireframes` | `use_figma` — creates page + all frames + layers |
-| `/ux-design-system` | `Foundations` + `Components` + `Compositions` (SDS) | `use_figma` — pushes 5 Variable collections + 21 SDS primitives |
-| `/ux-hifi` | `03_HiFi_Designs` | `use_figma` — creates hi-fi frames referencing design token colours |
-| `/ux-figma-docs` | `05_UX_Documentation` | `use_figma` — creates a documentation section frame per phase with research, personas, flows, findings, and more |
+### Which Commands Use FigJam vs Figma
 
-**Read from Figma (inspect) — fully automated:**
+| Phase | Tool | What gets created |
+|-------|------|------------------|
+| `/ux-kickoff` | **FigJam** | `00_Kickoff` board — stakeholder map, RACI, risk notes |
+| `/ux-discover` | **FigJam** | `01_Discovery` board — assumption stickies, competitor cards, risk register |
+| `/ux-empathize` | **FigJam** | `02_Empathy` board — empathy map 2×2, task flow diagram, mental models, storyboard |
+| `/ux-research` | **FigJam** | `03_Research` board — research plan, screener criteria, question bank |
+| `/ux-synthesize` | **FigJam** | `04_Synthesis` board — affinity cluster stickies, journey map, persona cards |
+| `/ux-frame` | **FigJam** | `05_Framing` board — HMW voting stickies, POV statements, design principles |
+| `/ux-ideate` | **FigJam** | `06_Ideation` board — concept sketches, evaluation matrix |
+| `/ux-sitemap` | **FigJam** | `07_Sitemap` board — IA diagram with connectors, URL hierarchy |
+| `/ux-sprint` | **FigJam** | `08_Sprint` board — Day 1–5 sprint boards, storyboard, rainbow spreadsheet |
+| `/ux-test` | **FigJam** | `09_Testing` board — test plan, task scenarios |
+| `/ux-test-results` | **FigJam** | `09_Testing` board — rainbow spreadsheet, findings by severity |
+| `/ux-brief` | **Figma** | `05_UX_Documentation` page — design brief summary frame |
+| `/ux-inspire` | **Figma** | `05_UX_Documentation` page — mood board, colour palette frame |
+| `/ux-wireframe` | **Figma** | `01_LoFi_Wireframes` page — all lo-fi frames |
+| `/ux-prototype` | **Figma** | `02_Prototype_Flows` page — interaction flow frames |
+| `/ux-design-system` | **Figma** | `00_Design_System` — 5 Variable collections + 21 SDS components |
+| `/ux-hifi` | **Figma** | `03_HiFi_Designs` page — hi-fi frames with token colours |
+| `/ux-handoff` | **Figma** | `04_Handoff_Specs` page — annotated handoff frames |
+| `/ux-accessibility` | **Figma** | `05_UX_Documentation` — WCAG audit frame |
+| `/ux-changelog` | **Figma** | `05_UX_Documentation` — changelog frame |
+| `/ux-measure` | **Figma** | `05_UX_Documentation` — measurement plan frame |
+| `/ux-report` | **Figma** | `05_UX_Documentation` — executive summary frame |
+| `/ux-to-code` | **Figma** (read) | Reads `00_Design_System` → generates component library |
+| `/ux-to-pages` | **Figma** (read) | Reads `03_HiFi_Designs` → generates page components |
 
-| Command | Reads Figma Page | Output |
-|---------|-----------------|--------|
-| `/ux-to-code` | `Components` (SDS) | Component library + `figma-component-map.json` + Code Connect files |
-| `/ux-to-pages` | `03_HiFi_Designs` | Page components + `figma-screen-map.json` |
+### Prerequisites
 
-**Prerequisite:** `PROJECT_BRIEF.md` must contain a `Figma File URL` under the `Figma Integration` section. Claude extracts the file key automatically.
+- `PROJECT_BRIEF.md` must have a `Figma File URL` for design phases
+- `PROJECT_BRIEF.md` must have a `FigJam File URL` for discovery/research phases
+- Both URLs are set once — all commands read from the brief automatically
+- A valid Figma account must be connected via the Figma MCP plugin
 
-**How it works:**
-1. Claude calls `mcp__figma__use_figma` to write designs (frames, variables, components) directly into Figma
-2. The Figma MCP (claude-plugins-official) handles the request via the Figma REST API
-3. Figma updates the file live — pages, frames, and variables are created immediately
-4. No Bridge Plugin, local MCP server, or manual steps needed
-
-**Requirement:** A valid Figma access token must be configured in the Figma MCP (claude-plugins-official).
-
-See `figma/FIGMA-MCP-SETUP.md` for tool reference, troubleshooting, and Plugin API patterns.
+See `figma/FIGMA-MCP-SETUP.md` for setup, tool reference, and troubleshooting.
 
 ## Framework Choice
 When running `/ux-to-code` or `/ux-to-pages`, Claude will ask:
